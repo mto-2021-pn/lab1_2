@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 /**
- * 
+ *
  */
 package pl.com.bottega.ecommerce.sales.domain.invoicing;
 
