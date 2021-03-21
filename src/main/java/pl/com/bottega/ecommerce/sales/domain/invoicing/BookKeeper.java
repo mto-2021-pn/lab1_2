@@ -18,44 +18,25 @@ import java.util.List;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
+import pl.com.bottega.ecommerce.sales.domain.invoicing.Invoice.InvoiceBuilder;
 
 public class BookKeeper {
 
-    public Invoice issuance(ClientData client, List<RequestItem> items) {
-        Invoice invoice = new Invoice(Id.generate(), client);
+    private final TaxFactory taxFactory = new TaxFactory();
 
-        for (RequestItem item : items) {
-            Money net = item.getTotalCost();
-            BigDecimal ratio = null;
-            String desc = null;
+    public Invoice issuance(InvoiceRequest request) {
+        InvoiceBuilder invoiceBuilder = Invoice.builder()
+                .setId(Id.generate())
+                .setClient(request.getClient());
 
-            switch (item.getProductData().getType()) {
-                case DRUG:
-                    ratio = BigDecimal.valueOf(0.05);
-                    desc = "5% (D)";
-                    break;
-                case FOOD:
-                    ratio = BigDecimal.valueOf(0.07);
-                    desc = "7% (F)";
-                    break;
-                case STANDARD:
-                    ratio = BigDecimal.valueOf(0.23);
-                    desc = "23%";
-                    break;
+        for (RequestItem item : request.getItems()) {
+            Tax tax = taxFactory.calculateTax(item);
 
-                default:
-                    throw new IllegalArgumentException(item.getProductData().getType() + " not handled");
-            }
-
-            Money taxValue = net.multiplyBy(ratio);
-
-            Tax tax = new Tax(taxValue, desc);
-
-            InvoiceLine invoiceLine = new InvoiceLine(item.getProductData(), item.getQuantity(), net, tax);
-            invoice.addItem(invoiceLine);
+            InvoiceLine invoiceLine = new InvoiceLine(item.getProductData(), item.getQuantity(), item.getTotalCost(), tax);
+            invoiceBuilder.addItem(invoiceLine);
         }
 
-        return invoice;
+        return invoiceBuilder.build();
     }
 
 }
