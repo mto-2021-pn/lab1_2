@@ -24,7 +24,7 @@ public class Payment {
 
     private Id aggregateId;
 
-    public Payment(Id aggregateId, ClientData clientData, Money amount) {
+    private Payment(Id aggregateId, ClientData clientData, Money amount) {
         this.aggregateId = aggregateId;
         this.clientData = clientData;
         this.amount = amount;
@@ -35,4 +35,10 @@ public class Payment {
 
         return new Payment(id, clientData, amount.multiplyBy(-1));
     }
+
+    public static Payment createPayment(Id aggregateId, ClientData clientData, Money amount){
+        return new Payment(aggregateId, clientData, amount);
+    }
+
+
 }
