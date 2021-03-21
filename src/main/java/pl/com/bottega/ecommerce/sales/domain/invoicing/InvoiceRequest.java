@@ -12,6 +12,11 @@ public class InvoiceRequest {
     private ClientData client;
     private List<RequestItem> items = new ArrayList<>();
 
+    public InvoiceRequest(ClientData client, List<RequestItem> items){
+        this.client=client;
+        items.addAll(this.items);
+    }
+
     public InvoiceRequest(ClientData client) {
         this.client = client;
     }

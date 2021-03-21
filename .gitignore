@@ -1,4 +1,7 @@
 /target/
+/doc/
 /.classpath
 /.project
-/.settings/
+.settings
+/.idea/
+lab1_2.iml

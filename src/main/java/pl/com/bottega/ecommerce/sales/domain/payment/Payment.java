@@ -16,7 +16,7 @@ import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 
-public class Payment {
+public class Payment extends PaymentFactory{
 
     private ClientData clientData;
 
@@ -33,6 +33,11 @@ public class Payment {
     public Payment rollBack() {
         Id id = Id.generate();
 
-        return new Payment(id, clientData, amount.multiplyBy(-1));
+        return createPayment(id, clientData, amount.multiplyBy(-1));
+    }
+
+    @Override
+    public Payment createPayment(Id aggregateId, ClientData clientData, Money amount) {
+        return new Payment(aggregateId, clientData, amount);
     }
 }
