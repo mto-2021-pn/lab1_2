@@ -32,7 +32,7 @@ public class Invoice {
 
     private Id id;
 
-    Invoice(Id invoiceId, ClientData client) {
+    private Invoice(Id invoiceId, ClientData client) {
         this.id = invoiceId;
         this.client = client;
         this.items = new ArrayList<InvoiceLine>();
@@ -41,11 +41,67 @@ public class Invoice {
         this.gros = Money.ZERO;
     }
 
-    public void addItem(InvoiceLine item) {
-        items.add(item);
+    public static InvoiceBuilder builder() {
+        return new InvoiceBuilder();
+    }
 
-        net = net.add(item.getNet());
-        gros = gros.add(item.getGros());
+    public static final class InvoiceBuilder {
+
+        private ClientData client;
+        private Money net = Money.ZERO;
+        private Money gros = Money.ZERO;
+        private List<InvoiceLine> items = new ArrayList<>();
+        private Id id;
+
+        private InvoiceBuilder() {}
+
+        public InvoiceBuilder setClient(ClientData clientData) {
+            this.client = clientData;
+            return this;
+        }
+
+        public InvoiceBuilder setNet(Money net) {
+            this.net = net;
+            return this;
+        }
+
+        public InvoiceBuilder setGros(Money gros) {
+            this.gros = gros;
+            return this;
+        }
+
+        public InvoiceBuilder setItems(List<InvoiceLine> items) {
+            this.items = items;
+            return this;
+        }
+
+        public InvoiceBuilder setId(Id id) {
+            this.id = id;
+            return this;
+        }
+
+        public InvoiceBuilder addItem(InvoiceLine item) {
+            this.items.add(item);
+            this.addNet(item.getNet());
+            this.addGros(item.getGros());
+            return this;
+        }
+
+        private void addNet(Money net) {
+            this.net.add(net);
+        }
+
+        private void addGros(Money gros) {
+            this.gros.add(gros);
+        }
+
+        public Invoice build() {
+            Invoice invoice = new Invoice(this.id, this.client);
+            invoice.gros = this.gros;
+            invoice.items = this.items;
+            invoice.net = this.net;
+            return invoice;
+        }
     }
 
     /**
